@@ -291,11 +291,11 @@ export class AdminComponent implements OnInit {
 
       counts.esenceZvrhlosti = delitel;
 
-      //remove whole parts from counts
-      counts.pudTela -= delitel * requirements.pudTela;
-      counts.slastMysli -= delitel * requirements.slastMysli;
-      counts.iluzeNadvlady -= delitel * requirements.iluzeNadvlady;
-      counts.zrnkoDekadence -= delitel * requirements.zrnkoDekadence
+      // //remove whole parts from counts
+      // counts.pudTela -= delitel * requirements.pudTela;
+      // counts.slastMysli -= delitel * requirements.slastMysli;
+      // counts.iluzeNadvlady -= delitel * requirements.iluzeNadvlady;
+      // counts.zrnkoDekadence -= delitel * requirements.zrnkoDekadence
 
 
 
