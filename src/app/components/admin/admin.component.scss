@@ -1,0 +1,86 @@
+:host {
+  display: block;
+}
+
+.margins{
+  margin: 20px;
+  padding: 10px;
+}
+
+.team-list {
+  background-color: rgb(240, 201, 250);
+}
+
+.start-stop {
+  background-color: rgb(216, 201, 250);
+}
+
+.esence{
+  background-color: rgb(201, 250, 213);
+}
+
+.esencelog{
+  background-color: rgb(250, 249, 201);
+}
+
+button {
+  margin-right: 5px;
+}
+
+
+
+
+
+
+.esencelog {
+
+  .esence-log-header,
+  .esence-log-item {
+    display: flex;
+    align-items: center;
+    padding: 0.3rem 0.5rem;
+    border-bottom: 1px solid #ddd;
+    font-size: 0.9rem;
+  }
+
+  .esence-log-header {
+    font-weight: 600;
+    background-color: #f0f0f0;
+  }
+
+  .esence-log-item:hover {
+    background-color: #f9f9f9;
+  }
+
+  .col {
+    padding: 0 0.5rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .col.time {
+    width: 80px;
+  }
+  .col.cycle {
+    width: 150px;
+  }
+  .col.team {
+    width: 120px;
+  }
+  .col.essence {
+    width: 120px;
+  }
+  .col.points {
+    width: 60px;
+    text-align: right;
+  }
+  .col.action {
+    width: 80px;
+    text-align: center;
+  }
+
+  button {
+    min-width: 64px;
+  }
+}

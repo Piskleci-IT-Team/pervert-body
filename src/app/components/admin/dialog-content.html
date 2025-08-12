@@ -1,0 +1,11 @@
+<h2 mat-dialog-title>Přidání nového týmu</h2>
+<mat-dialog-content class="mat-typography">
+  <mat-form-field>
+    <mat-label>Zadej název týmu:</mat-label>
+    <input matInput [(ngModel)]="data.teamName" placeholder="Enter team name">
+  </mat-form-field>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-flat-button color="warn" mat-dialog-close>Zrušit</button>
+  <button mat-flat-button color="primary" [mat-dialog-close]="data.teamName" cdkFocusInitial>Přidat</button>
+</mat-dialog-actions>

@@ -1,0 +1,74 @@
+<div class="margins team-list">
+    <h2>Team list</h2> 
+    <button mat-button color="primary" (click)="toggleList = !toggleList">{{toggleList ? 'Skrýt' : 'Zobrazit'}}</button>
+    @if(toggleList){
+        <mat-list>   
+            @for( team of teams; track team) {
+                <mat-list-item>
+                    {{ team }} <button mat-button (click)="deleteTeam(team)" color="warn">Delete</button>
+                </mat-list-item>
+            }
+        </mat-list>
+        <button mat-flat-button color="primary" (click)="openDialog()">Přidat tým</button>
+    }
+</div>
+
+<div class="margins start-stop">
+    <h2>Zahájení/pauza/reset</h2> 
+    Čas soutěže: {{ timer * 1000| date:'H:mm:ss':'UTC' }} <br>
+    Aktuální cyklus: {{ currentCycle }} <br>
+    <button mat-flat-button color="primary" (click)="startTimer()">Start</button>
+    <button mat-flat-button color="accent" (click)="stopTimer()">Pauza</button>
+    <button mat-flat-button color="warn" (click)="resetTimer()">Reset</button>
+</div>
+
+<div class="margins esence">
+    <h2>Zápis esence</h2> 
+    <mat-form-field>
+        <mat-label>Zvol tým</mat-label>
+        <mat-select [(ngModel)]="selectedTeam" required>
+          @for (team of teams; track team) {
+            <mat-option [value]="team">{{ team }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+    
+
+        @for (esence of esences; track esence) {
+        <button mat-flat-button color="primary" (click)="addEssence(esence)" [disabled]="!selectedTeam">{{esence}}</button>
+        }
+
+</div>
+
+<div class="margins esencelog">
+    <h2>Log esencí</h2>
+  
+    <!-- Header řádek -->
+    <div class="esence-log-header">
+      <span class="col time">Čas</span>
+      <span class="col cycle">Cyklus</span>
+      <span class="col team">Tým</span>
+      <span class="col essence">Esence</span>
+      <span class="col points">Body</span>
+      <span class="col action"></span>
+    </div>
+  
+    <!-- Data řádky -->
+    @for (es of esenceLog; track es) {
+      <div class="esence-log-item">
+        <span class="col time">{{ es.timestamp * 1000 | date:'H:mm:ss':'UTC' }}</span>
+        <span class="col cycle">{{ es.cycle }}</span>
+        <span class="col team">{{ es.team }}</span>
+        <span class="col essence">{{ es.essence }}</span>
+        <span class="col points">{{ es.totalPoints }}</span>
+        <span class="col action">
+          <button mat-button color="warn" (click)="deleteEssence(es)">Delete</button>
+        </span>
+      </div>
+    }
+  </div>
+  
+
+
+  <button mat-flat-button color="primary" (click)="cleanReset()">Smazat vše</button>
+
