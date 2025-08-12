@@ -25,6 +25,15 @@ export interface EssenceData {
   totalPoints: number;
 }
 
+export interface EssenceCount {
+  team: string,
+  pudTela: number, 
+  slastMysli: number, 
+  iluzeNadvlady: number, 
+  zrnkoDekadence: number,
+  esenceZvrhlosti: number,
+}
+
 @Component({
   selector: 'app-admin',
   standalone: true,
@@ -49,11 +58,13 @@ export class AdminComponent implements OnInit {
 
   toggleList: boolean = false;
   timer: number = 0;
+  cycleRemaining: number = 0;
   intervalId: any;
 
   currentCycle: string = '';
 
   esenceLog: EssenceData[] = [];
+  essenceCount: EssenceCount[] = [];
 
   startTimer(): void {
     this.intervalId = setInterval(() => {
@@ -109,6 +120,7 @@ export class AdminComponent implements OnInit {
 
     if(items['essences']) {
       this.esenceLog = items['essences'].reverse();
+      this.countEsences();
     } else {
       this.esenceLog = [];
     }
@@ -156,6 +168,7 @@ export class AdminComponent implements OnInit {
     const cycles = ['Probouzení pudů', 'Mentální slast', 'Mocenská hra', 'Zpětná vlna', 'Ztráta kontroly', 'Vyrovnání sil'];
     const cycleIndex = Math.floor(this.timer / time) % cycles.length; 
     this.currentCycle = cycles[cycleIndex];
+    this.cycleRemaining = time - (this.timer % time);
   }
 
   addEssence(essence: string): void{
@@ -171,6 +184,9 @@ export class AdminComponent implements OnInit {
     es.push(data);
     this.storageService.setItem('essences', es);
     this.esenceLog = es.reverse();
+
+    this.countEsences();
+
   }
 
   countPoints(essence: string): number {
@@ -212,12 +228,81 @@ export class AdminComponent implements OnInit {
       esences.splice(index, 1);
       this.storageService.setItem('essences', esences);
       this.esenceLog = esences.reverse();
+      this.countEsences();
     } else {
     }
   }
 
   cleanReset(){
     this.storageService.clear();
+  }
+
+  countEsences() {
+    
+    this.essenceCount = [];
+
+    const esences = this.storageService.getItem('essences') as EssenceData[] || [];
+
+    for (const team of this.teams) {
+      const counts: EssenceCount = {
+        team: team,
+        pudTela: 0,
+        slastMysli: 0,
+        iluzeNadvlady: 0,
+        zrnkoDekadence: 0,
+        esenceZvrhlosti: 0,
+      };  
+
+      for (const es of esences) {
+        if (es.team === team) {
+          switch (es.essence) {
+            case 'Pud těla':
+              counts.pudTela += es.totalPoints;
+              break;
+            case 'Slast mysli':
+              counts.slastMysli += es.totalPoints;
+              break;
+            case 'Iluze nadvlády':
+              counts.iluzeNadvlady += es.totalPoints;
+              break;
+            case 'Zrnko dekadence':
+              counts.zrnkoDekadence += es.totalPoints;
+              break;
+          }
+        }
+      }
+      const requirements = {
+        pudTela: 24,
+        slastMysli: 6,
+        iluzeNadvlady: 2,
+        zrnkoDekadence: 1
+      };
+
+      // Spočítáme celé podíly
+      const quotients = [
+        Math.floor(counts.pudTela / requirements.pudTela),
+        Math.floor(counts.slastMysli / requirements.slastMysli),
+        Math.floor(counts.iluzeNadvlady / requirements.iluzeNadvlady),
+        Math.floor(counts.zrnkoDekadence / requirements.zrnkoDekadence)
+      ];
+
+      // Najdeme nejmenší nenulový podíl
+      const delitel = Math.min(...quotients);
+
+      counts.esenceZvrhlosti = delitel;
+
+      //remove whole parts from counts
+      counts.pudTela -= delitel * requirements.pudTela;
+      counts.slastMysli -= delitel * requirements.slastMysli;
+      counts.iluzeNadvlady -= delitel * requirements.iluzeNadvlady;
+      counts.zrnkoDekadence -= delitel * requirements.zrnkoDekadence
+
+
+
+      this.essenceCount.push(counts);
+    }
+
+    
   }
 
 }

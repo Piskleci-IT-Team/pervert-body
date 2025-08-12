@@ -1,26 +1,54 @@
-<div class="margins team-list">
-    <h2>Team list</h2> 
-    <button mat-button color="primary" (click)="toggleList = !toggleList">{{toggleList ? 'Skrýt' : 'Zobrazit'}}</button>
-    @if(toggleList){
-        <mat-list>   
-            @for( team of teams; track team) {
-                <mat-list-item>
-                    {{ team }} <button mat-button (click)="deleteTeam(team)" color="warn">Delete</button>
-                </mat-list-item>
-            }
-        </mat-list>
-        <button mat-flat-button color="primary" (click)="openDialog()">Přidat tým</button>
-    }
+<div class="admin-container">
+    <div class="margins team-list">
+        <h2>Team list</h2> 
+        <button mat-button color="primary" (click)="toggleList = !toggleList">{{toggleList ? 'Skrýt' : 'Zobrazit'}}</button>
+        @if(toggleList){
+            <mat-list>   
+                @for( team of teams; track team) {
+                    <mat-list-item>
+                        {{ team }} <button mat-button (click)="deleteTeam(team)" color="warn">Delete</button>
+                    </mat-list-item>
+                }
+            </mat-list>
+            <button mat-flat-button color="primary" (click)="openDialog()">Přidat tým</button>
+        }
+    </div>
+    
+    <div class="margins start-stop">
+        <h2>Zahájení/pauza/reset</h2> 
+        Čas soutěže: {{ timer * 1000| date:'H:mm:ss':'UTC' }} <br>
+        Aktuální cyklus: {{ currentCycle }} (zbývá {{ cycleRemaining * 1000| date:'mm:ss':'UTC' }}) <br>
+        <button mat-flat-button color="primary" (click)="startTimer()">Start</button>
+        <button mat-flat-button color="accent" (click)="stopTimer()">Pauza</button>
+        <button mat-flat-button color="warn" (click)="resetTimer()">Reset</button>
+    </div>
 </div>
 
-<div class="margins start-stop">
-    <h2>Zahájení/pauza/reset</h2> 
-    Čas soutěže: {{ timer * 1000| date:'H:mm:ss':'UTC' }} <br>
-    Aktuální cyklus: {{ currentCycle }} <br>
-    <button mat-flat-button color="primary" (click)="startTimer()">Start</button>
-    <button mat-flat-button color="accent" (click)="stopTimer()">Pauza</button>
-    <button mat-flat-button color="warn" (click)="resetTimer()">Reset</button>
+<div class="margins esencelog">
+    <h2>Výsledky</h2>
+     <!-- Header řádek -->
+    <div class="esence-log-header">
+        <span class="col team">Tým</span>
+        <span class="col essence">Pud těla</span>
+        <span class="col essence">Slast mysli</span>
+        <span class="col essence">Iluze nadvlády</span>
+        <span class="col essence">Zrnko dekadence</span>
+        <span class="col essence">Esence zvrhlosti</span>
+      </div>
+    
+      <!-- Data řádky -->
+      @for (es of essenceCount; track es) {
+        <div class="esence-log-item">
+          <span class="col team">{{ es.team }}</span>
+          <span class="col essence">{{ es.pudTela }}</span>
+          <span class="col essence">{{ es.slastMysli }}</span>
+          <span class="col essence">{{ es.iluzeNadvlady }}</span>
+          <span class="col essence">{{ es.zrnkoDekadence }}</span>
+          <span class="col essence">{{ es.esenceZvrhlosti }}</span>
+        </div>
+      }
 </div>
+
 
 <div class="margins esence">
     <h2>Zápis esence</h2> 
