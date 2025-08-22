@@ -1,1 +1,31 @@
-<p>home works!</p>
+<div class="bg">
+    <div>
+        <h1 class="nadpis">ČAS DO KONCE HRY - {{ remainingGameTime * 1000| date:'H:mm:ss':'UTC' }} </h1>
+        <h2 class="nadpis2">CYKLUS EROTIČNA - {{ currentCycle }}</h2>
+        <h2 class="nadpis2">ZMENA CYKLU EROTIČNA - {{ remainingTime * 1000| date:'mm:ss':'UTC' }}</h2>
+    </div>
+
+    <div class="esencelog">
+         <!-- Header řádek -->
+        <div class="esence-log-header">
+            <span class="col team">Tým</span>
+            <span class="col essence">Pud těla</span>
+            <span class="col essence">Slast mysli</span>
+            <span class="col essence">Iluze nadvlády</span>
+            <span class="col essence">Zrnko dekadence</span>
+            <span class="col essence">ESENCE ZVRHLOSTI</span>
+          </div>
+        
+          <!-- Data řádky -->
+          @for (es of essenceCount; track es) {
+            <div class="esence-log-item">
+              <span class="col team">{{ es.team }}</span>
+              <span class="col essence">{{ es.pudTela }}</span>
+              <span class="col essence">{{ es.slastMysli }}</span>
+              <span class="col essence">{{ es.iluzeNadvlady }}</span>
+              <span class="col essence">{{ es.zrnkoDekadence }}</span>
+              <span class="col essence">{{ es.esenceZvrhlosti }}</span>
+            </div>
+          }
+    </div>
+</div>

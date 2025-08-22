@@ -28,6 +28,7 @@ export class LocalstorageService {
     const items: { [key: string]: any } = {};
     for (let i = 0; i < localStorage.length; i++) {
       const key = localStorage.key(i);
+      console.log('Key:', key);
       if (key) {
         items[key] = this.getItem(key);
       }

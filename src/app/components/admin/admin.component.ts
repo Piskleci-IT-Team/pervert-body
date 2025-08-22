@@ -61,10 +61,11 @@ export class AdminComponent implements OnInit {
   cycleRemaining: number = 0;
   intervalId: any;
 
-  currentCycle: string = '';
+  currentCycle: string = 'Probouzení pudů';
 
   esenceLog: EssenceData[] = [];
   essenceCount: EssenceCount[] = [];
+  essenceCountDisplay: EssenceCount[] = [];
 
   startTimer(): void {
     this.intervalId = setInterval(() => {
@@ -72,8 +73,17 @@ export class AdminComponent implements OnInit {
       this.storageService.setItem('timer', this.timer);
       this.storageService.setItem('timerStatus', 'run');
       this.actualCycleFn();
+
+      this.saveVariables();
     }, 1000);
   }
+
+  saveVariables(): void {
+    this.storageService.setItem('cycleRemaining', this.cycleRemaining);
+    this.storageService.setItem('currentCycle', this.currentCycle);
+    this.storageService.setItem('essencesCountDisplay', this.essenceCountDisplay);
+  }
+
 
   stopTimer(): void {
     if (this.intervalId) {
@@ -135,6 +145,9 @@ export class AdminComponent implements OnInit {
     } else {
       console.warn(`Team ${teamName} already exists or is invalid.`);
     }
+
+    //alphabetically order teams
+    this.teams.sort((a, b) => a.localeCompare(b));
   }
 
 
@@ -186,6 +199,7 @@ export class AdminComponent implements OnInit {
     this.esenceLog = es.reverse();
 
     this.countEsences();
+    this.saveVariables();
 
   }
 
@@ -240,6 +254,7 @@ export class AdminComponent implements OnInit {
   countEsences() {
     
     this.essenceCount = [];
+    this.essenceCountDisplay = [];
 
     const esences = this.storageService.getItem('essences') as EssenceData[] || [];
 
@@ -297,10 +312,20 @@ export class AdminComponent implements OnInit {
       // counts.iluzeNadvlady -= delitel * requirements.iluzeNadvlady;
       // counts.zrnkoDekadence -= delitel * requirements.zrnkoDekadence
 
-
-
       this.essenceCount.push(counts);
+
+      //remove whole parts from counts
+      counts.pudTela -= delitel * requirements.pudTela;
+      counts.slastMysli -= delitel * requirements.slastMysli;
+      counts.iluzeNadvlady -= delitel * requirements.iluzeNadvlady;
+      counts.zrnkoDekadence -= delitel * requirements.zrnkoDekadence
+
+      this.essenceCountDisplay.push(counts);
     }
+
+    //order alphabetically by team name essenceCount and essenceCountDisplay
+    this.essenceCount.sort((a, b) => a.team.localeCompare(b.team));
+    this.essenceCountDisplay.sort((a, b) => a.team.localeCompare(b.team));
 
     
   }
