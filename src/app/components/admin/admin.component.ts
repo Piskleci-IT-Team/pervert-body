@@ -67,6 +67,8 @@ export class AdminComponent implements OnInit {
   essenceCount: EssenceCount[] = [];
   essenceCountDisplay: EssenceCount[] = [];
 
+  gameTime = 3 * 60 * 60; // 3 hours in seconds
+
   startTimer(): void {
     this.intervalId = setInterval(() => {
       this.timer++;
@@ -82,6 +84,7 @@ export class AdminComponent implements OnInit {
     this.storageService.setItem('cycleRemaining', this.cycleRemaining);
     this.storageService.setItem('currentCycle', this.currentCycle);
     this.storageService.setItem('essencesCountDisplay', this.essenceCountDisplay);
+    this.storageService.setItem('gameTime', this.gameTime); 
   }
 
 
@@ -126,6 +129,10 @@ export class AdminComponent implements OnInit {
       }
     } else {
       this.timer = 0;
+    }
+
+    if(items['gameTime']) {
+      this.gameTime = items['gameTime'];
     }
 
     if(items['essences']) {
@@ -329,7 +336,6 @@ export class AdminComponent implements OnInit {
 
     
   }
-
 }
 
 @Component({

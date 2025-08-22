@@ -16,7 +16,7 @@
     
     <div class="margins start-stop">
         <h2>Zahájení/pauza/reset</h2> 
-        Čas soutěže: {{ timer * 1000| date:'H:mm:ss':'UTC' }} <br>
+        Čas soutěže: {{ timer * 1000 | date:'H:mm:ss':'UTC' }} (zbývá {{ (gameTime - timer) * 1000 | date:'H:mm:ss':'UTC' }} )<br>
         Aktuální cyklus: {{ currentCycle }} (zbývá {{ cycleRemaining * 1000| date:'mm:ss':'UTC' }}) <br>
         <button mat-flat-button color="primary" (click)="startTimer()">Start</button>
         <button mat-flat-button color="accent" (click)="stopTimer()">Pauza</button>
