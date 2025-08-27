@@ -12,6 +12,8 @@ import {
   MatDialogRef,
 } from '@angular/material/dialog';
 import {MatListModule} from '@angular/material/list';
+import { BeService } from '../../services/be.service';
+import { HttpClientModule } from '@angular/common/http';
 
 export interface DialogData {
   teamName: string;
@@ -44,7 +46,8 @@ export interface EssenceCount {
     MatButtonModule,
     MatListModule,
     MatFormFieldModule, 
-    MatSelectModule
+    MatSelectModule,
+    HttpClientModule
   ],
   templateUrl: './admin.component.html',
   styleUrl: './admin.component.scss'
@@ -77,6 +80,7 @@ export class AdminComponent implements OnInit {
       this.actualCycleFn();
 
       this.saveVariables();
+      this.saveVariablesToBe();
     }, 1000);
   }
 
@@ -85,6 +89,22 @@ export class AdminComponent implements OnInit {
     this.storageService.setItem('currentCycle', this.currentCycle);
     this.storageService.setItem('essencesCountDisplay', this.essenceCountDisplay);
     this.storageService.setItem('gameTime', this.gameTime); 
+
+
+
+  }
+
+  saveVariablesToBe(): void {
+    //send to backend
+    this.beService.writeGameData(
+      String(this.timer),
+      this.storageService.getItem('timerStatus') || 'stop',
+      String(this.gameTime),
+      this.esenceLog
+    ).subscribe({
+      next: (data) => {
+      }
+    });
   }
 
 
@@ -105,7 +125,8 @@ export class AdminComponent implements OnInit {
 
   constructor(
     private storageService: LocalstorageService,
-    public dialog: MatDialog
+    public dialog: MatDialog,
+    private beService: BeService,
   ) { 
     
   }
@@ -113,34 +134,76 @@ export class AdminComponent implements OnInit {
   ngOnInit(): void {
     const items = this.storageService.getAllItems();
 
-    console.log('Items loaded from local storage:', items);
-
-    if(items['teams']) {
-      this.teams = items['teams'];
-    } else {
-      this.teams = [];
-    }
-
-    if(items['timer']) {
-      this.timer = items['timer'];
-      this.actualCycleFn();
-      if(items['timerStatus'] === 'run') {
-        this.startTimer();
+    //call backend to get all teams
+    this.beService.getAllTeams().subscribe({
+      next: (data) => {
+        console.log('Teams fetched from backend:', data);
+        if (Array.isArray(data)) {
+          this.teams = data.map((item: any) => item.name).sort((a, b) => a.localeCompare(b));
+        } else {
+          console.warn('Unexpected data format:', data);
+        }
+      },
+      error: (error) => {
+        console.error('Error fetching teams from backend:', error);
+        if(items['teams']) {
+          this.teams = items['teams'];
+        } else {
+          this.teams = [];
+        }
       }
-    } else {
-      this.timer = 0;
-    }
+    });
 
-    if(items['gameTime']) {
-      this.gameTime = items['gameTime'];
-    }
+    //get Gamedata from backend
+    this.beService.getGameData().subscribe({
+      next: (data) => {
+        console.log('Game data fetched from backend:', data);
 
-    if(items['essences']) {
-      this.esenceLog = items['essences'].reverse();
-      this.countEsences();
-    } else {
-      this.esenceLog = [];
-    }
+        if(data) {
+          this.timer = data.timer
+          this.actualCycleFn();
+          if(data.timerStatus === 'run') {
+            this.startTimer();
+          }
+          this.gameTime = data.gameTime;
+          this.esenceLog = data.essences;
+          //push essences to localstorage
+          this.storageService.setItem('essences', data.essences);
+          this.countEsences();
+          this.saveVariables();
+        }
+        else{
+
+          if(items['timer']) {
+            this.timer = items['timer'];
+            this.actualCycleFn();
+            if(items['timerStatus'] === 'run') {
+              this.startTimer();
+            }
+          } else {
+            this.timer = 0;
+          }
+      
+          if(items['gameTime']) {
+            this.gameTime = items['gameTime'];
+          }
+      
+          if(items['essences']) {
+            this.esenceLog = items['essences'].reverse();
+            this.countEsences();
+          } else {
+            this.esenceLog = [];
+          }
+        }
+
+      },
+      error: (error) => {
+        
+      }
+    });
+
+
+
   }
 
   addTeam(teamName: string): void {
@@ -148,6 +211,14 @@ export class AdminComponent implements OnInit {
     if (teamName && !this.teams.includes(teamName)) {
       this.teams.push(teamName);
       this.storageService.setItem('teams', this.teams);
+
+      //send to backend
+      this.beService.addTeam(teamName).subscribe({
+        next: (data) => {
+          console.log('Team added to backend:', data);
+        }
+      });
+
       console.log(`Team ${teamName} added.`);
     } else {
       console.warn(`Team ${teamName} already exists or is invalid.`);
@@ -163,6 +234,14 @@ export class AdminComponent implements OnInit {
     if (index > -1) {
       this.teams.splice(index, 1);
       this.storageService.setItem('teams', this.teams);
+
+      //send to backend
+      this.beService.deleteTeam(team).subscribe({
+        next: (data) => {
+          console.log('Team deleted from backend:', data);
+        }
+      });
+
       console.log(`Team ${team} deleted.`);
     } else {
       console.warn(`Team ${team} not found.`);
@@ -250,12 +329,21 @@ export class AdminComponent implements OnInit {
       this.storageService.setItem('essences', esences);
       this.esenceLog = esences.reverse();
       this.countEsences();
+      this.saveVariablesToBe();
     } else {
     }
   }
 
   cleanReset(){
     this.storageService.clear();
+    this.beService.deleteGameData().subscribe({
+      next: (data) => {
+        console.log('Game data deleted from backend:', data);
+      }
+    });
+    this.esenceLog = [];
+    this.countEsences();
+    this.stopTimer();
   }
 
   countEsences() {
